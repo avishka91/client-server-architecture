@@ -1,22 +1,36 @@
 package com.smartcampus;
 
+import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.server.ResourceConfig;
+
 import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
 
 /**
- * JAX-RS Application subclass — present for specification completeness only.
+ * Main JAX-RS Application configuration class.
  *
- * NOTE: This class is NOT active at runtime. The application is bootstrapped
- * programmatically in Main.java using a Grizzly HTTP server and a ResourceConfig
- * with package scanning (.packages("com.smartcampus")). When using the Grizzly
- * embedded server directly, JAX-RS does NOT use the @ApplicationPath annotation
- * or this Application subclass — the base URI is set explicitly in Main.java.
+ * Extends ResourceConfig (which itself extends Application) so that Jersey
+ * can automatically scan and register all resource classes, exception mappers,
+ * and filters found in the "com.smartcampus" package.
  *
- * This class is retained as documentation of intent and for potential future
- * deployment in a servlet container (e.g., Tomcat/WildFly) where it would
- * become the active entry point.
+ * Deployment modes:
+ *  - Tomcat / GlassFish (WAR): This class is the active entry point.
+ *    The @ApplicationPath("/api/v1") annotation sets the base URL, so all
+ *    endpoints are accessible at: http://localhost:8080/<context-root>/api/v1/
+ *
+ *  - Standalone Grizzly (JAR): Main.java bootstraps the server directly and
+ *    constructs its own ResourceConfig, so this class is bypassed in that mode.
  */
 @ApplicationPath("/api/v1")
-public class SmartCampusApplication extends Application {
-    // No additional configuration required.
+public class SmartCampusApplication extends ResourceConfig {
+
+    public SmartCampusApplication() {
+        // Scan the entire com.smartcampus package for:
+        //   - Resource classes (@Path)
+        //   - Exception mappers (@Provider + ExceptionMapper)
+        //   - Filters (ContainerRequestFilter / ContainerResponseFilter)
+        packages("com.smartcampus");
+
+        // Register Jackson so Jersey serialises POJOs to/from JSON automatically
+        register(JacksonFeature.class);
+    }
 }

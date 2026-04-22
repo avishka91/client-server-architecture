@@ -9,15 +9,14 @@
     <version>1.0-SNAPSHOT</version>
 
     <!--
-        WAR packaging: allows deployment to a servlet container (GlassFish, Tomcat, etc.)
-        via NetBeans. The SmartCampusApplication.java @ApplicationPath("/api/v1") annotation
-        becomes the active entry point in this mode.
-        The Grizzly embedded server (Main.java) still works as a standalone JAR alternative.
+        WAR packaging — deploys to Tomcat (or GlassFish) via NetBeans.
+        SmartCampusApplication with @ApplicationPath("/api/v1") is the entry point.
+        API lives at: http://localhost:8080/smart-campus-api/api/v1/
     -->
     <packaging>war</packaging>
 
     <name>Smart Campus Sensor API</name>
-    <description>A RESTful API for managing campus sensor rooms, sensors, and readings using JAX-RS (Jersey).</description>
+    <description>A RESTful API for managing campus sensor rooms, sensors, and readings using JAX-RS (Jersey) on Tomcat.</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -28,21 +27,14 @@
     </properties>
 
     <dependencies>
-        <!-- Jersey Core + Servlet Container support (for WAR deployment) -->
+        <!-- Jersey Servlet Container (integrates Jersey with Tomcat) -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet</artifactId>
             <version>${jersey.version}</version>
         </dependency>
 
-        <!-- Keep Grizzly for standalone JAR usage (Main.java) -->
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-grizzly2-http</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-
-        <!-- Jersey JSON (Jackson) support -->
+        <!-- Jersey JSON support via Jackson -->
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
@@ -56,7 +48,10 @@
             <version>${jersey.version}</version>
         </dependency>
 
-        <!-- Java EE / Jakarta Servlet API (provided by GlassFish at runtime) -->
+        <!--
+            Servlet API — marked as "provided" because Tomcat supplies this
+            at runtime. Including it in the WAR would cause conflicts.
+        -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -66,8 +61,14 @@
     </dependencies>
 
     <build>
+        <!--
+            Sets the WAR file name to "smart-campus-api.war" so that the
+            Tomcat context path is /smart-campus-api (clean URLs in Postman/curl).
+        -->
+        <finalName>smart-campus-api</finalName>
+
         <plugins>
-            <!-- Compiler Plugin -->
+            <!-- Java 17 Compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -78,16 +79,16 @@
                 </configuration>
             </plugin>
 
-            <!-- WAR Plugin: packages the project as a deployable WAR file -->
+            <!-- WAR Plugin: no web.xml needed — annotation-based JAX-RS config -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
-                    <!-- No web.xml needed — JAX-RS 2.x uses annotation-based configuration -->
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 </project>
+
