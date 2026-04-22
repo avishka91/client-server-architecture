@@ -4,13 +4,19 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 /**
- * JAX-RS Application subclass that sets the base API path.
- * 
- * The @ApplicationPath annotation establishes the versioned entry point
- * for all API resources. All resource paths are relative to "/api/v1".
+ * JAX-RS Application subclass — present for specification completeness only.
+ *
+ * NOTE: This class is NOT active at runtime. The application is bootstrapped
+ * programmatically in Main.java using a Grizzly HTTP server and a ResourceConfig
+ * with package scanning (.packages("com.smartcampus")). When using the Grizzly
+ * embedded server directly, JAX-RS does NOT use the @ApplicationPath annotation
+ * or this Application subclass — the base URI is set explicitly in Main.java.
+ *
+ * This class is retained as documentation of intent and for potential future
+ * deployment in a servlet container (e.g., Tomcat/WildFly) where it would
+ * become the active entry point.
  */
 @ApplicationPath("/api/v1")
 public class SmartCampusApplication extends Application {
-    // JAX-RS will automatically discover and register all resource classes
-    // and providers in the scanned packages.
+    // No additional configuration required.
 }

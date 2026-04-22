@@ -10,6 +10,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JAX-RS Resource class for managing sensor rooms.
@@ -133,8 +134,10 @@ public class SensorRoomResource {
         }
 
         dataStore.removeRoom(roomId);
-        return Response.ok()
-                .entity("{\"message\": \"Room successfully deleted\", \"roomId\": \"" + roomId + "\"}")
-                .build();
+        Map<String, String> body = Map.of(
+                "message", "Room successfully deleted",
+                "roomId", roomId
+        );
+        return Response.ok(body).build();
     }
 }

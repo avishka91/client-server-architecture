@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -75,11 +76,11 @@ public class DataStore {
         room2.addSensorId(sensor3.getId());
         room3.addSensorId(sensor4.getId());
 
-        // Initialize empty reading lists for each sensor
-        readings.put(sensor1.getId(), new ArrayList<>());
-        readings.put(sensor2.getId(), new ArrayList<>());
-        readings.put(sensor3.getId(), new ArrayList<>());
-        readings.put(sensor4.getId(), new ArrayList<>());
+        // Initialize empty reading lists for each sensor (CopyOnWriteArrayList for thread safety)
+        readings.put(sensor1.getId(), new CopyOnWriteArrayList<>());
+        readings.put(sensor2.getId(), new CopyOnWriteArrayList<>());
+        readings.put(sensor3.getId(), new CopyOnWriteArrayList<>());
+        readings.put(sensor4.getId(), new CopyOnWriteArrayList<>());
 
         // Add a sample reading to sensor1
         SensorReading reading1 = new SensorReading(sensor1.getId(), 23.5, "°C");
@@ -132,8 +133,8 @@ public class DataStore {
      */
     public void addSensor(Sensor sensor) {
         sensors.put(sensor.getId(), sensor);
-        // Initialize an empty reading list for the new sensor
-        readings.putIfAbsent(sensor.getId(), new ArrayList<>());
+        // Initialize a thread-safe reading list for the new sensor
+        readings.putIfAbsent(sensor.getId(), new CopyOnWriteArrayList<>());
         // Update parent room's sensorIds list
         SensorRoom room = rooms.get(sensor.getRoomId());
         if (room != null) {
@@ -171,7 +172,7 @@ public class DataStore {
      */
     public List<Sensor> getSensorsByType(String type) {
         return sensors.values().stream()
-                .filter(s -> s.getType().equalsIgnoreCase(type))
+                .filter(s -> s.getType() != null && s.getType().equalsIgnoreCase(type))
                 .collect(Collectors.toList());
     }
 
@@ -184,6 +185,7 @@ public class DataStore {
     }
 
     public void addReading(String sensorId, SensorReading reading) {
-        readings.computeIfAbsent(sensorId, k -> new ArrayList<>()).add(reading);
+        // CopyOnWriteArrayList ensures thread-safe concurrent writes from multiple requests
+        readings.computeIfAbsent(sensorId, k -> new CopyOnWriteArrayList<>()).add(reading);
     }
 }
