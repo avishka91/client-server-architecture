@@ -91,7 +91,7 @@ src/main/java/com/smartcampus/
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/smart-campus-sensor-api.git
+git clone https://github.com/avishka91/smart-campus-sensor-api.git
 cd smart-campus-sensor-api
 ```
 
