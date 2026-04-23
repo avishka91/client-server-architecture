@@ -49,43 +49,7 @@ public class DataStore {
      * Pre-seeds the data store with sample data for demonstration purposes.
      */
     private void initializeSampleData() {
-        // Create sample rooms with capacity
-        SensorRoom room1 = new SensorRoom("Lab A - Computer Science", "Building 1, Wing A", 2, 30);
-        SensorRoom room2 = new SensorRoom("Lecture Hall 101", "Building 2, Main Block", 1, 120);
-        SensorRoom room3 = new SensorRoom("Server Room B3", "Building 3, Basement", 0, 10);
-
-        rooms.put(room1.getId(), room1);
-        rooms.put(room2.getId(), room2);
-        rooms.put(room3.getId(), room3);
-
-        // Create sample sensors linked to rooms
-        Sensor sensor1 = new Sensor(room1.getId(), "Temperature", "Temp Sensor A1");
-        Sensor sensor2 = new Sensor(room1.getId(), "CO2", "CO2 Monitor A1");
-        Sensor sensor3 = new Sensor(room2.getId(), "Humidity", "Humidity Sensor LH101");
-        Sensor sensor4 = new Sensor(room3.getId(), "Temperature", "Temp Sensor B3");
-        sensor4.setStatus("MAINTENANCE");  // One sensor in maintenance for testing
-
-        sensors.put(sensor1.getId(), sensor1);
-        sensors.put(sensor2.getId(), sensor2);
-        sensors.put(sensor3.getId(), sensor3);
-        sensors.put(sensor4.getId(), sensor4);
-
-        // Maintain sensorIds on parent rooms
-        room1.addSensorId(sensor1.getId());
-        room1.addSensorId(sensor2.getId());
-        room2.addSensorId(sensor3.getId());
-        room3.addSensorId(sensor4.getId());
-
-        // Initialize empty reading lists for each sensor (CopyOnWriteArrayList for thread safety)
-        readings.put(sensor1.getId(), new CopyOnWriteArrayList<>());
-        readings.put(sensor2.getId(), new CopyOnWriteArrayList<>());
-        readings.put(sensor3.getId(), new CopyOnWriteArrayList<>());
-        readings.put(sensor4.getId(), new CopyOnWriteArrayList<>());
-
-        // Add a sample reading to sensor1
-        SensorReading reading1 = new SensorReading(sensor1.getId(), 23.5, "°C");
-        readings.get(sensor1.getId()).add(reading1);
-        sensor1.setCurrentValue(23.5);
+        // Sample data has been removed. API starts empty.
     }
 
     // =========================================================================

@@ -32,13 +32,6 @@ public class DiscoveryResource {
         discovery.put("version", "1.0");
         discovery.put("description", "RESTful API for managing campus sensor infrastructure including rooms, sensors, and sensor readings.");
 
-        // Administrative Contact
-        Map<String, String> contact = new LinkedHashMap<>();
-        contact.put("name", "Smart Campus Admin");
-        contact.put("email", "admin@smartcampus.edu");
-        contact.put("department", "IT Infrastructure & IoT");
-        discovery.put("contact", contact);
-
         // Resource Links (HATEOAS-style navigation)
         Map<String, Object> resources = new LinkedHashMap<>();
 
