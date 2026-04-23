@@ -9,29 +9,26 @@
     <version>1.0-SNAPSHOT</version>
 
     <!--
-        WAR packaging — deploys to Tomcat 10 via NetBeans.
+        WAR packaging — deploys to Tomcat 8.5 (XAMPP) via NetBeans.
         SmartCampusApplication with @ApplicationPath("/api/v1") is the entry point.
         API lives at: http://localhost:8080/smart-campus-api/api/v1/
-
-        TOMCAT 10 requires the Jakarta namespace (jakarta.*) instead of javax.*.
-        Jersey 3.x uses jakarta.* — this is why we upgraded from Jersey 2.x.
     -->
     <packaging>war</packaging>
 
     <name>Smart Campus Sensor API</name>
-    <description>RESTful API for campus sensor infrastructure using JAX-RS (Jersey 3) on Tomcat 10.</description>
+    <description>RESTful API for campus sensor infrastructure using JAX-RS (Jersey 2) on Tomcat 8.5.</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Jersey 3.x uses jakarta.* — required for Tomcat 10 -->
-        <jersey.version>3.1.5</jersey.version>
+        <!-- Jersey 2.x uses javax.* — compatible with Tomcat 8.5/9 -->
+        <jersey.version>2.41</jersey.version>
         <failOnMissingWebXml>false</failOnMissingWebXml>
     </properties>
 
     <dependencies>
-        <!-- Jersey Servlet Container for Tomcat 10 (jakarta namespace) -->
+        <!-- Jersey Servlet Container (integrates Jersey with Tomcat) -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet</artifactId>
@@ -53,22 +50,18 @@
         </dependency>
 
         <!--
-            Jakarta Servlet API 6.0 — provided by Tomcat 10 at runtime.
-            Marked "provided" so it is NOT bundled in the WAR (avoids class conflicts).
+            Servlet API — marked as "provided" because Tomcat supplies this
+            at runtime. Including it in the WAR would cause conflicts.
         -->
         <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <!--
-            Sets the WAR file name so the Tomcat context path is /smart-campus-api.
-            Endpoints: http://localhost:8080/smart-campus-api/api/v1/rooms etc.
-        -->
         <finalName>smart-campus-api</finalName>
 
         <plugins>

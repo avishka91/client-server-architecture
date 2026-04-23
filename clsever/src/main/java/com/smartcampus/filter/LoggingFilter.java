@@ -1,19 +1,13 @@
 package com.smartcampus.filter;
 
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.container.ContainerResponseContext;
-import jakarta.ws.rs.container.ContainerResponseFilter;
-import jakarta.ws.rs.ext.Provider;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-/**
- * JAX-RS Filter for API observability (logging).
- *
- * Logs every incoming request (method + URI) and every outgoing response (status code).
- * Applies globally to ALL endpoints — no need to add logging to each resource method.
- */
 @Provider
 public class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter {
 

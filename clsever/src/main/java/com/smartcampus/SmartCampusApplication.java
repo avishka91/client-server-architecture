@@ -3,7 +3,7 @@ package com.smartcampus;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import jakarta.ws.rs.ApplicationPath;
+import javax.ws.rs.ApplicationPath;
 
 /**
  * Main JAX-RS Application configuration class.
