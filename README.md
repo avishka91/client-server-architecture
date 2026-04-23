@@ -1,6 +1,6 @@
 # Smart Campus Sensor API
 
-A RESTful API built with **JAX-RS (Jersey)** and **Grizzly** embedded HTTP server for managing campus sensor infrastructure — rooms, sensors, and sensor readings. All data is stored in-memory using thread-safe `ConcurrentHashMap` data structures.
+A RESTful API built with **JAX-RS (Jersey 2.41)** and deployed as a **WAR on Apache Tomcat** for managing campus sensor infrastructure — rooms, sensors, and sensor readings. All data is stored in-memory using thread-safe `ConcurrentHashMap` data structures.
 
 ---
 
@@ -9,7 +9,7 @@ A RESTful API built with **JAX-RS (Jersey)** and **Grizzly** embedded HTTP serve
 - [API Design Overview](#api-design-overview)
 - [Technology Stack](#technology-stack)
 - [Project Structure](#project-structure)
-- [How to Build and Run](#how-to-build-and-run)
+- [How to Build and Deploy](#how-to-build-and-deploy)
 - [API Endpoints](#api-endpoints)
 - [Sample curl Commands](#sample-curl-commands)
 - [Error Handling](#error-handling)
@@ -36,128 +36,149 @@ Key design features:
 
 ## Technology Stack
 
-| Component           | Technology                  |
-|--------------------|-----------------------------|
-| Language           | Java 17                     |
-| API Framework      | JAX-RS 2.1 (Jersey 2.41)   |
-| Embedded Server    | Grizzly HTTP Server          |
-| JSON Processing    | Jackson (via Jersey media)   |
-| Dependency Injection | HK2                       |
-| Build Tool         | Apache Maven                 |
-| Data Storage       | `ConcurrentHashMap` (in-memory) |
+| Component             | Technology                          |
+|----------------------|-------------------------------------|
+| Language             | Java 17                             |
+| API Framework        | JAX-RS 2.1 (Jersey 2.41)           |
+| Application Server   | Apache Tomcat 9.x                   |
+| Packaging            | WAR (Web Application Archive)       |
+| JSON Processing      | Jackson (via Jersey media)          |
+| Dependency Injection | HK2                                 |
+| Build Tool           | Apache Maven 3.6+                   |
+| IDE                  | NetBeans (with Tomcat integration)  |
+| Data Storage         | `ConcurrentHashMap` (in-memory)     |
 
 ---
 
 ## Project Structure
 
 ```
-src/main/java/com/smartcampus/
-├── Main.java                               # Grizzly server bootstrap
-├── SmartCampusApplication.java             # @ApplicationPath("/api/v1")
-├── model/
-│   ├── SensorRoom.java                     # Room entity
-│   ├── Sensor.java                         # Sensor entity
-│   └── SensorReading.java                  # Reading entity
-├── repository/
-│   └── DataStore.java                      # Singleton in-memory data store
-├── resource/
-│   ├── DiscoveryResource.java              # GET /api/v1 (HATEOAS)
-│   ├── SensorRoomResource.java             # /api/v1/rooms
-│   ├── SensorResource.java                 # /api/v1/sensors
-│   └── SensorReadingResource.java          # Sub-resource for readings
-├── exception/
-│   ├── RoomNotEmptyException.java          # 409 Conflict
-│   ├── LinkedResourceNotFoundException.java # 422 Unprocessable Entity
-│   ├── SensorUnavailableException.java     # 403 Forbidden
-│   └── ErrorResponse.java                  # Standard error JSON body
-├── mapper/
-│   ├── RoomNotEmptyExceptionMapper.java
-│   ├── LinkedResourceNotFoundExceptionMapper.java
-│   ├── SensorUnavailableExceptionMapper.java
-│   └── GenericExceptionMapper.java         # 500 catch-all
-└── filter/
-    └── LoggingFilter.java                  # Request/Response logging
+clsever/
+├── pom.xml                                     # Maven build config (WAR packaging)
+├── nb-configuration.xml                        # NetBeans IDE project settings
+└── src/
+    └── main/
+        ├── java/com/smartcampus/
+        │   ├── SmartCampusApplication.java      # @ApplicationPath("/api/v1") — WAR entry point
+        │   ├── model/
+        │   │   ├── SensorRoom.java              # Room entity
+        │   │   ├── Sensor.java                  # Sensor entity
+        │   │   └── SensorReading.java           # Reading entity
+        │   ├── repository/
+        │   │   └── DataStore.java               # Singleton in-memory data store
+        │   ├── resource/
+        │   │   ├── DiscoveryResource.java       # GET /api/v1 (HATEOAS)
+        │   │   ├── SensorRoomResource.java      # /api/v1/rooms
+        │   │   ├── SensorResource.java          # /api/v1/sensors
+        │   │   └── SensorReadingResource.java   # Sub-resource for readings
+        │   ├── exception/
+        │   │   ├── RoomNotEmptyException.java          # 409 Conflict
+        │   │   ├── LinkedResourceNotFoundException.java # 422 Unprocessable Entity
+        │   │   ├── SensorUnavailableException.java     # 403 Forbidden
+        │   │   └── ErrorResponse.java                  # Standard error JSON body
+        │   ├── mapper/
+        │   │   ├── RoomNotEmptyExceptionMapper.java
+        │   │   ├── LinkedResourceNotFoundExceptionMapper.java
+        │   │   ├── SensorUnavailableExceptionMapper.java
+        │   │   └── GenericExceptionMapper.java         # 500 catch-all
+        │   └── filter/
+        │       └── LoggingFilter.java                  # Request/Response logging
+        └── webapp/
+            ├── index.html                       # Optional API welcome page
+            └── WEB-INF/                         # (no web.xml — annotation-based config)
 ```
 
 ---
 
-## How to Build and Run
+## How to Build and Deploy
 
 ### Prerequisites
 
 - **Java 17** or later installed (`java -version` to verify)
 - **Apache Maven 3.6+** installed (`mvn -version` to verify)
+- **Apache Tomcat 9.x** installed and configured in NetBeans
+- **NetBeans IDE** with the Tomcat server registered under *Tools → Servers*
 
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/avishka91/smart-campus-sensor-api.git
-cd smart-campus-sensor-api
+git clone https://github.com/avishka91/client-server-architecture.git
+cd client-server-architecture/clsever
 ```
 
-### Step 2: Build the Project
+### Step 2: Build the WAR File
 
 ```bash
 mvn clean package
 ```
 
-This compiles the code and creates a fat JAR (with all dependencies) in the `target/` directory.
+This compiles the code and produces `smart-campus-api.war` inside the `target/` directory.
 
-### Step 3: Run the Server
+### Step 3: Deploy to Tomcat via NetBeans
+
+1. Open the project in **NetBeans** (`File → Open Project → clsever`)
+2. Right-click the project in the Projects panel → **Properties**
+3. Under **Run**, confirm the server is set to **Apache Tomcat 9.x**
+4. Click the green **Run** button (or press `F6`)
+5. NetBeans will build, deploy, and open the browser automatically
+
+The API will be available at:
+
+```
+http://localhost:8080/smart-campus-api/api/v1
+```
+
+### Step 4: Manual WAR Deployment (without NetBeans)
 
 ```bash
-java -jar target/smart-campus-sensor-api-1.0-SNAPSHOT.jar
+# Copy the WAR to Tomcat's webapps directory
+cp target/smart-campus-api.war /path/to/tomcat/webapps/
+
+# Start Tomcat
+/path/to/tomcat/bin/startup.sh        # Linux/macOS
+/path/to/tomcat/bin/startup.bat       # Windows
 ```
 
-The server will start on **http://localhost:8080**. You should see:
-
-```
-Smart Campus Sensor API
-Server started at: http://localhost:8080/
-API Base Path:     http://localhost:8080/api/v1
-Press Enter to stop the server...
-```
-
-### Alternative: Run with Maven Exec
-
-```bash
-mvn clean compile exec:java -Dexec.mainClass="com.smartcampus.Main"
-```
+Then open: `http://localhost:8080/smart-campus-api/api/v1`
 
 ---
 
 ## API Endpoints
 
+> **Base URL:** `http://localhost:8080/smart-campus-api/api/v1`
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/v1` | Discovery endpoint (API metadata & links) |
-| GET | `/api/v1/rooms` | List all rooms |
-| POST | `/api/v1/rooms` | Create a new room |
-| GET | `/api/v1/rooms/{roomId}` | Get room by ID |
-| PUT | `/api/v1/rooms/{roomId}` | Update a room |
-| DELETE | `/api/v1/rooms/{roomId}` | Delete a room (blocked if sensors exist) |
-| GET | `/api/v1/sensors` | List all sensors (supports `?type=` filter) |
-| POST | `/api/v1/sensors` | Create a sensor (validates roomId) |
-| GET | `/api/v1/sensors/{sensorId}` | Get sensor by ID |
-| PUT | `/api/v1/sensors/{sensorId}` | Update a sensor |
-| DELETE | `/api/v1/sensors/{sensorId}` | Delete a sensor |
-| GET | `/api/v1/sensors/{sensorId}/readings` | Get all readings for a sensor |
-| POST | `/api/v1/sensors/{sensorId}/readings` | Add a reading (blocked if MAINTENANCE) |
+| GET | `/` | Discovery endpoint (API metadata & links) |
+| GET | `/rooms` | List all rooms |
+| POST | `/rooms` | Create a new room |
+| GET | `/rooms/{roomId}` | Get room by ID |
+| PUT | `/rooms/{roomId}` | Update a room |
+| DELETE | `/rooms/{roomId}` | Delete a room (blocked if sensors exist) |
+| GET | `/sensors` | List all sensors (supports `?type=` filter) |
+| POST | `/sensors` | Create a sensor (validates roomId) |
+| GET | `/sensors/{sensorId}` | Get sensor by ID |
+| PUT | `/sensors/{sensorId}` | Update a sensor |
+| DELETE | `/sensors/{sensorId}` | Delete a sensor |
+| GET | `/sensors/{sensorId}/readings` | Get all readings for a sensor |
+| POST | `/sensors/{sensorId}/readings` | Add a reading (blocked if MAINTENANCE) |
 
 ---
 
 ## Sample curl Commands
 
+> **Replace** `localhost:8080/smart-campus-api` with your actual host if different.
+
 ### 1. Discovery Endpoint — Get API metadata
 
 ```bash
-curl -X GET http://localhost:8080/api/v1
+curl -X GET http://localhost:8080/smart-campus-api/api/v1
 ```
 
 ### 2. Create a New Room
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/rooms \
+curl -X POST http://localhost:8080/smart-campus-api/api/v1/rooms \
   -H "Content-Type: application/json" \
   -d '{"name": "Physics Lab 202", "location": "Building 4, Wing B", "floor": 2}'
 ```
@@ -165,59 +186,67 @@ curl -X POST http://localhost:8080/api/v1/rooms \
 ### 3. List All Rooms
 
 ```bash
-curl -X GET http://localhost:8080/api/v1/rooms
+curl -X GET http://localhost:8080/smart-campus-api/api/v1/rooms
 ```
 
-### 4. Create a Sensor Linked to a Room
+### 4. Get a Specific Room by ID
+
+```bash
+curl -X GET http://localhost:8080/smart-campus-api/api/v1/rooms/ROOM_ID_HERE
+```
+
+### 5. Update a Room
+
+```bash
+curl -X PUT http://localhost:8080/smart-campus-api/api/v1/rooms/ROOM_ID_HERE \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Chemistry Lab 101", "location": "Building 2, Wing A", "floor": 1}'
+```
+
+### 6. Create a Sensor Linked to a Room
 
 > **Note:** Replace `ROOM_ID_HERE` with an actual room ID from the list rooms response.
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/sensors \
+curl -X POST http://localhost:8080/smart-campus-api/api/v1/sensors \
   -H "Content-Type: application/json" \
   -d '{"roomId": "ROOM_ID_HERE", "type": "Temperature", "name": "Temp Sensor PL202"}'
 ```
 
-### 5. Filter Sensors by Type
+### 7. Filter Sensors by Type
 
 ```bash
-curl -X GET "http://localhost:8080/api/v1/sensors?type=CO2"
+curl -X GET "http://localhost:8080/smart-campus-api/api/v1/sensors?type=CO2"
 ```
 
-### 6. Add a Sensor Reading
+### 8. Add a Sensor Reading
 
 > **Note:** Replace `SENSOR_ID_HERE` with an actual sensor ID.
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/sensors/SENSOR_ID_HERE/readings \
+curl -X POST http://localhost:8080/smart-campus-api/api/v1/sensors/SENSOR_ID_HERE/readings \
   -H "Content-Type: application/json" \
   -d '{"value": "24.7", "unit": "°C"}'
 ```
 
-### 7. Get Reading History for a Sensor
+### 9. Get Reading History for a Sensor
 
 ```bash
-curl -X GET http://localhost:8080/api/v1/sensors/SENSOR_ID_HERE/readings
+curl -X GET http://localhost:8080/smart-campus-api/api/v1/sensors/SENSOR_ID_HERE/readings
 ```
 
-### 8. Delete a Room (will fail if sensors exist — 409)
+### 10. Delete a Room (will fail with 409 if sensors exist)
 
 ```bash
-curl -X DELETE http://localhost:8080/api/v1/rooms/ROOM_ID_HERE
+curl -X DELETE http://localhost:8080/smart-campus-api/api/v1/rooms/ROOM_ID_HERE
 ```
 
-### 9. Attempt to Create Sensor with Invalid Room ID (422)
+### 11. Attempt to Create Sensor with Invalid Room ID (422)
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/sensors \
+curl -X POST http://localhost:8080/smart-campus-api/api/v1/sensors \
   -H "Content-Type: application/json" \
   -d '{"roomId": "non-existent-id", "type": "CO2", "name": "Ghost Sensor"}'
-```
-
-### 10. Get a Specific Room by ID
-
-```bash
-curl -X GET http://localhost:8080/api/v1/rooms/ROOM_ID_HERE
 ```
 
 ---
@@ -391,7 +420,7 @@ HTTP 422 (Unprocessable Entity) is more semantically accurate than 404 (Not Foun
 
 Exposing internal Java stack traces to external API consumers poses several significant security risks:
 
-1. **Technology Fingerprinting**: Stack traces reveal the exact frameworks, libraries, and versions in use (e.g., `jersey-server-2.41.jar`, `grizzly-http-server-4.0.jar`). Attackers can search for known CVEs (Common Vulnerabilities and Exposures) targeting those specific versions.
+1. **Technology Fingerprinting**: Stack traces reveal the exact frameworks, libraries, and versions in use (e.g., `jersey-server-2.41.jar`, `tomcat-embed-core-9.x.jar`). Attackers can search for known CVEs (Common Vulnerabilities and Exposures) targeting those specific versions.
 
 2. **Internal Architecture Exposure**: Package names and class names (e.g., `com.smartcampus.repository.DataStore`) reveal the internal structure of the application, making it easier to understand the codebase and identify potential attack vectors.
 
@@ -403,7 +432,7 @@ Exposing internal Java stack traces to external API consumers poses several sign
 
 6. **Injection Point Discovery**: Knowing exactly where a `NullPointerException` or other error occurred helps attackers craft specific inputs to trigger and exploit those code paths.
 
-Our `GenericExceptionMapper` catch-all ensures that no internal details ever reach the client. The exception is logged internally for debugging, but a generic "Internal Server Error" message is returned to the API consumer.
+Our `GenericExceptionMapper` catch-all ensures that no internal details ever reach the client. The exception is logged internally (via Tomcat's catalina.out log) for debugging, but a generic "Internal Server Error" message is returned to the API consumer.
 
 ---
 
@@ -423,4 +452,4 @@ Using JAX-RS Filters for cross-cutting concerns like logging is advantageous ove
 
 6. **Enabling/Disabling**: A filter can be easily registered or unregistered (e.g., disable verbose logging in production) without touching any resource class.
 
-Our `LoggingFilter` implements both `ContainerRequestFilter` and `ContainerResponseFilter`, logging the HTTP method and URI for incoming requests and the status code for outgoing responses using `java.util.logging.Logger`.
+Our `LoggingFilter` implements both `ContainerRequestFilter` and `ContainerResponseFilter`, logging the HTTP method and URI for incoming requests and the status code for outgoing responses. In Tomcat, these logs appear in the console during development and in `logs/catalina.out` in production.
